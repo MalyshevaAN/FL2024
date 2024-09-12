@@ -1,0 +1,11 @@
+abc 1
+abcb 1
+abcbcbcbcbcb 1
+ab 1
+a 0
+b 0 
+c 0 
+ac 0
+abcbcbcbc 0
+abcccc 0
+abca 0
