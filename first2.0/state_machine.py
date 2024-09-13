@@ -13,18 +13,19 @@ class State_Machine:
             for index in end:
                 self.ends[int(index)] = 1  # = 1 if point is end, = 0 otherwise
 
-            self.graph = [dict() for x in range(self.n)] 
+            self.graph = [[set() for y in range(self.m)] for x in range(self.n)] 
             line = f.readline()
             while line:
                 line = line.split()
                 fr = int(line[0])
-                way = line[1]
+                way = int(line[1])
                 to = int(line[2])
-                if (way not in self.graph[fr].keys()):
-                    self.graph[fr][way] = []
-                self.graph[fr][way].append(to)
+                self.graph[fr][way].add(to)
                 line = f.readline()
-
+            self.new_point_to_index = dict()
+            self.new_graph = []
+            self.new_start_index = 0
+            self.new_ends = []
 
     def dfs(self, v, word) -> bool:
         '''Check if it is possible
@@ -35,8 +36,8 @@ class State_Machine:
         if (len(word) == 0 and self.ends[v] == 0):
             return False
         
-        char = word[0]
-        if (char not in self.graph[v]):
+        char = int(word[0])
+        if (len(self.graph[v][char]) == 0):
             return False
         
         for x in self.graph[v][char]:
