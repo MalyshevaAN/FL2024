@@ -1,57 +1,125 @@
-def compile_regex(regex):
-    instructions = []
-    pc = 0  # program counter
+class Virtual_Machine:
+    def __init__(self, reqular_expression):
+        self.expression = reqular_expression
+        self.commands = []
+        self.alphabeth = ['a', 'b']
+        self.special_signs = ['|', '?', '*', '+']
 
-    def add_instruction(op, *args):
-        nonlocal pc
-        instructions.append((pc, op, *args))
-        pc += 1
 
-    def compile_expr(expr):
-        nonlocal pc
-        if not expr:
+    def build_commands(self):
+        parts, commands_count = self.get_all_parts()
+        index = 0
+        used_commands = 0
+        parts_count = len(parts)
+        while parts_count - index != 1:
+            next_part_index = used_commands + len(parts[index]) + 2
+            self.commands.append(f'split {used_commands + 1} {next_part_index}')
+            self.commands.extend(parts[index])
+            self.commands.append(f'jmp {commands_count}')
+            used_commands = next_part_index
+            index += 1
+
+        self.commands.extend(parts[-1])
+        self.commands.append("match")
+
+
+    def get_all_parts(self) -> tuple:
+        parts = []
+        last_part_start = 0
+        read_commands = 0
+        for i in range(len(self.expression) + 1):
+            if i == len(self.expression):
+                new_part = self.get_one_part(last_part_start, len(self.expression), read_commands)
+                parts.append(new_part)
+                read_commands += len(new_part)
+                break
+
+            if self.expression[i] == '|':
+                read_commands += 1
+                new_part = self.get_one_part(last_part_start, i, read_commands)
+                read_commands += len(new_part)
+                read_commands += 1
+                parts.append(new_part)
+                last_part_start = i+1
+
+        return (parts, read_commands)
+
+    def get_one_part(self, start_index, end_index, commands_before) -> list:
+        commands = []
+        for i in range(start_index, end_index):
+            if self.expression[i] in self.alphabeth:
+                commands.append(f'char {self.expression[i]}')
+                continue
+            
+            if self.expression[i] == '+':
+                l1 = len(commands)-1 + commands_before
+                commands.append(f'split {l1} {l1 + 2}')
+                continue
+
+            if self.expression[i] == '*':
+                prev_command = commands.pop()
+                command_parts = prev_command.split()
+
+                if (command_parts[0] != "char"): # we have no  braces, so input *+, for example - is incorrect
+                    raise "Invalid regular expression!\n"
+                
+                char = command_parts[1]
+                l1 = len(commands) + commands_before
+                l2 = l1 + 1
+                l3 = l1 + 3
+                commands.append(f'split {l2} {l3}')
+                commands.append(f'char {char}')
+                commands.append(f'jmp {l1}')
+                continue
+
+            if self.expression[i] == '?':
+                prev_command = commands.pop()
+                command_parts = prev_command.split()
+                if (command_parts[0] != "char"):
+                    raise "Invalid regular expression!\n"
+                
+                char = command_parts[1]
+                l1 = len(commands) + 1 + commands_before
+                l2 = l1 + 1
+                commands.append(f'split {l1} {l2}')
+                commands.append(f'char {char}')
+                continue
+
+        return commands
+
+
+    def match_word(self, word, program_counter = 0, char_index = 0):
+        if len(self.commands) == 0:
+            print("Please, call build_commands function before matching!\n")
             return
+        counter = program_counter
+        while counter < len(self.commands):
+            command = self.commands[counter].split()
+            if (command[0] == 'match' and char_index == len(word)):
+                return True
+            
+            if (command[0] =='match' and char_index != len(word)):
+                return False
+            
+            if (command[0] == 'jmp'):
+                state = int(command[1])
+                counter = state
+                continue
 
-        i = 0
-        while i < len(expr):
-            char = expr[i]
+            if (command[0] == 'split'):
+                state1 = int(command[1])
+                state2 = int(command[2])
 
-            if char == 'a' or char == 'b':
-                add_instruction(f'char {char}')
-            elif char == '+':
-                last_inst = instructions[-1][0]  # Get last char instruction index
-                add_instruction(f'split {last_inst}, {pc + 1}')
-            elif char == '|':
-                left_expr = expr[:i]
-                right_expr = expr[i+1:]
-                L1 = pc
-                add_instruction(f'split {pc + 1}, {None}')  # Placeholder for right expr
-                L2 = pc
-                compile_expr(left_expr)
-                jmp_after_left = pc
-                add_instruction(f'jmp {None}')  # Placeholder for jumping after right expr
-                compile_expr(right_expr)
-                instructions[L1] = (L1, f'split {L1 + 1}, {L2 + len(instructions)}')
-                instructions[jmp_after_left] = (jmp_after_left, f'jmp {pc}')
-                return
-            elif char == '*':
-                L1 = pc
-                add_instruction(f'split {pc + 1}, {None}')  # Placeholder for after star expr
-                L2 = pc
-                compile_expr(expr[:i])
-                add_instruction(f'jmp {L1}')
-                instructions[L1] = (L1, f'split {L2}, {pc}')
-            i += 1
+                return self.match_word(word, state1, char_index) or self.match_word(word, state2, char_index)
+            
+            if (len(word) <= char_index):
+                return False
 
-    compile_expr(regex)
-    add_instruction('match')
-    return instructions
+            if (command[0] == 'char'):
+                if (command[1] != word[char_index]):
+                    return False
+                char_index += 1
+                counter += 1
+                continue
 
-
-# Пример использования:
-regex = "a|b*"
-instructions = compile_regex(regex)
-
-# Выводим инструкции:
-for instr in instructions:
-    print(instr)
+        return False
