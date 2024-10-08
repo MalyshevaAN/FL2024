@@ -1,0 +1,6 @@
+a?b?a?a|b*a*
+aaa 1
+baa 1
+aa 1
+aba 1
+abaa 1

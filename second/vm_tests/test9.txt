@@ -1,0 +1,11 @@
+aa?|bb?a*
+a 1
+b 1
+aa 1
+ba 1
+bba 1
+bbaaaaaaaaa 1
+aaaaaa 0
+aab 0
+ab 0
+aba 0

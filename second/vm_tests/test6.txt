@@ -1,0 +1,8 @@
+bbbb*a
+bbba 1
+bbbbbbbbba 1
+bbbbb 0
+bb 0
+b 0
+a 0
+aaaa 0
