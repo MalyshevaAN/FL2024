@@ -1,0 +1,15 @@
+b+a+b?|ab|aba|abbbb+
+ba 1
+bbbbbbbbbba 1
+baaaaaaaa 1
+baaaaaaaab 1
+bab 1
+ab 1
+aba 1
+abbbb 1
+abbbbbbb 1
+babab 0
+abb 0
+abbb 0
+a 0
+b 0

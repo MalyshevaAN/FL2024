@@ -1,0 +1,9 @@
+aaab*|b+
+aaa 1
+aaabbb 1
+aaab 1
+b 1
+ab 0
+abbbbb 0
+abababa 0
+baaaaa 0

@@ -1,0 +1,13 @@
+a?b*|ba+
+abbbb 1
+bbbbb 1
+a 1
+ab 1
+ba 1
+b 1
+baaaa 1
+aaaab 0
+aaaa 0
+aa 0
+ababab 0
+aba 0

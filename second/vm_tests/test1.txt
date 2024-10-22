@@ -1,0 +1,11 @@
+a+b+
+aaaaab 1
+abbbb 1
+ab 1
+aaaaabbbbb 1
+a 0
+b 0
+bbb 0
+aaaaaa 0
+aba 0
+abbbba 0

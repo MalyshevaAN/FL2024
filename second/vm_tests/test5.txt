@@ -1,0 +1,9 @@
+a|b*
+a 1
+b 1
+b 1
+ab 0
+abbbb 0
+ba 0
+babab 0
+ababa 0
